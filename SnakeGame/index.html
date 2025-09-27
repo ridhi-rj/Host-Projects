@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Press Start 2P for a retro feel -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <!-- Lucide Icons for UI elements -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide-static@latest/umd/lucide.js"></script>
+    <!-- Link to your custom stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4 text-center">
+
+    <!-- Landing Screen -->
+    <div id="landingScreen" class="w-full max-w-4xl mx-auto">
+        <h1 class="text-5xl md:text-7xl text-green-400 mb-4 animate-pulse">SNAKE</h1>
+        <p class="mb-8 text-lg text-gray-400">Select a map and start playing!</p>
+
+        <!-- Map Selection -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div id="map-classic" class="map-card selected rounded-lg p-6 bg-[#0D1117]">
+                <h3 class="text-xl mb-2 text-green-400">Classic Arena</h3>
+                <p class="text-sm text-gray-400">No walls, no problem. The original, endless playground.</p>
+            </div>
+            <div id="map-tunnel" class="map-card rounded-lg p-6 bg-[#0D1117]">
+                <h3 class="text-xl mb-2 text-yellow-400">The Tunnel</h3>
+                <p class="text-sm text-gray-400">Navigate a narrow passage. Don't hit the top or bottom!</p>
+            </div>
+            <div id="map-boxed" class="map-card rounded-lg p-6 bg-[#0D1117]">
+                <h3 class="text-xl mb-2 text-red-400">Boxed In</h3>
+                <p class="text-sm text-gray-400">A claustrophobic challenge with walls on all sides.</p>
+            </div>
+        </div>
+
+        <button id="startButton" class="action-btn rounded-lg">Start Game</button>
+    </div>
+
+    <!-- Game Screen (hidden by default) -->
+    <div id="gameScreen" class="hidden w-full max-w-fit mx-auto">
+        <!-- Game UI -->
+        <div id="game-ui" class="flex justify-between items-center w-full mb-4 text-lg">
+            <div>SCORE: <span id="score">0</span></div>
+            <button id="pauseButton" class="p-2 rounded-full hover:bg-gray-700 transition-colors">
+                <i data-lucide="pause" class="w-6 h-6"></i>
+            </button>
+            <div>HIGH SCORE: <span id="high-score">0</span></div>
+        </div>
+
+        <!-- Game Canvas -->
+        <canvas id="gameCanvas" class="rounded-lg"></canvas>
+        
+        <!-- Mobile Controls -->
+         <div id="mobileControls" class="mt-6 grid grid-cols-3 gap-2 w-48 mx-auto md:hidden">
+            <div></div>
+            <button id="upBtn" class="control-btn col-start-2"><i data-lucide="arrow-up" class="w-8 h-8"></i></button>
+            <div></div>
+            <button id="leftBtn" class="control-btn"><i data-lucide="arrow-left" class="w-8 h-8"></i></button>
+            <div></div>
+            <button id="rightBtn" class="control-btn"><i data-lucide="arrow-right" class="w-8 h-8"></i></button>
+            <div></div>
+            <button id="downBtn" class="control-btn col-start-2"><i data-lucide="arrow-down" class="w-8 h-8"></i></button>
+            <div></div>
+        </div>
+    </div>
+
+    <!-- Modals (Pause, Game Over) -->
+    <div id="pauseModal" class="hidden absolute inset-0 bg-black bg-opacity-80 flex-col items-center justify-center text-center p-4">
+        <h2 class="text-5xl text-yellow-400 mb-8">PAUSED</h2>
+        <div class="flex gap-4">
+            <button id="resumeButton" class="action-btn rounded-lg text-base px-6 py-3">Resume</button>
+            <button id="endGameButton" class="secondary-btn rounded-lg text-base px-6 py-3">End Game</button>
+        </div>
+    </div>
+    <div id="gameOverModal" class="hidden absolute inset-0 bg-black bg-opacity-80 flex-col items-center justify-center text-center p-4">
+        <h2 class="text-5xl text-red-500 mb-4">GAME OVER</h2>
+        <p class="text-2xl mb-2">Your Score: <span id="finalScore">0</span></p>
+        <p class="text-xl mb-8">High Score: <span id="finalHighScore">0</span></p>
+        <div class="flex gap-4">
+            <button id="restartButton" class="action-btn rounded-lg text-base px-6 py-3">Play Again</button>
+            <button id="mainMenuButton" class="secondary-btn rounded-lg text-base px-6 py-3">Main Menu</button>
+        </div>
+    </div>
+
+    <!-- Link to your game's JavaScript file -->
+    <script src="script.js"></script>
+</body>
+</html>

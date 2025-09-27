@@ -1,0 +1,69 @@
+/* Custom styles for the game */
+body {
+    font-family: 'Press Start 2P', cursive;
+    background-color: #0D1117; /* Dark background */
+    color: #C9D1D9; /* Light text */
+    touch-action: manipulation; /* Prevents zooming/scrolling on touch */
+}
+/* Style for the game canvas */
+canvas {
+    background-color: #010409;
+    border: 4px solid #30363D;
+    box-shadow: 0 0 30px rgba(56, 139, 253, 0.4);
+}
+/* Styling for primary action buttons */
+.action-btn {
+    background-image: linear-gradient(to right, #238636, #2ea043);
+    border: 2px solid #3fb950;
+    color: white;
+    padding: 1rem 2rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px #1a6f2b;
+    transform: translateY(-5px);
+    font-size: 1.1rem;
+}
+.action-btn:hover {
+    background-image: linear-gradient(to right, #2ea043, #3fb950);
+    box-shadow: 0 8px 20px rgba(63, 185, 80, 0.4);
+    transform: translateY(-7px);
+}
+.action-btn:active {
+    box-shadow: 0 0 #1a6f2b;
+    transform: translateY(0);
+}
+/* Styling for secondary/modal buttons */
+ .secondary-btn {
+    background-color: #21262D;
+    border: 2px solid #30363D;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.2s ease;
+}
+.secondary-btn:hover {
+    background-color: #30363D;
+    border-color: #8B949E;
+}
+/* Styling for map selection cards */
+.map-card {
+    border: 3px solid #30363D;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+}
+.map-card:hover {
+    border-color: #58A6FF;
+    transform: scale(1.05);
+}
+.map-card.selected {
+    border-color: #3fb950;
+    box-shadow: 0 0 20px rgba(63, 185, 80, 0.5);
+    transform: scale(1.05);
+}
+/* Mobile control buttons */
+.control-btn {
+    width: 60px; height: 60px;
+    background-color: rgba(48, 54, 61, 0.8);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+}
