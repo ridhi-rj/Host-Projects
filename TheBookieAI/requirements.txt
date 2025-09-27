@@ -1,0 +1,6 @@
+#TheBookieAI/requirements.txt
+#This file lists the Python packages needed to run the bot.
+#Install them using: pip install -r requirements.txt
+
+python-telegram-bot==21.0.1
+python-dotenv==1.0.1
