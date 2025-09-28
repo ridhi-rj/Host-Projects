@@ -6,6 +6,7 @@ import os
 from dotenv import load_dotenv
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
+import requests # <-- ADD THIS LINE
 
 # --- Configuration ---
 # Load environment variables from .env file in the config directory
@@ -24,32 +25,9 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-# --- Mock Book Database ---
-# In a real-world application, this would be a database (e.g., PostgreSQL, MongoDB)
-# or an API call to a book-finding service.
-# For this example, we use a simple dictionary with public domain books from Project Gutenberg.
-MOCK_BOOK_DATABASE = {
-    "pride and prejudice": {
-        "author": "Jane Austen",
-        "link": "https://www.gutenberg.org/ebooks/1342.pdf.images"
-    },
-    "frankenstein": {
-        "author": "Mary Shelley",
-        "link": "https://www.gutenberg.org/ebooks/84.pdf.images"
-    },
-    "moby dick": {
-        "author": "Herman Melville",
-        "link": "https://www.gutenberg.org/ebooks/2701.pdf.images"
-    },
-    "a tale of two cities": {
-        "author": "Charles Dickens",
-        "link": "https://www.gutenberg.org/ebooks/98.pdf.images"
-    },
-    "the adventures of sherlock holmes": {
-        "author": "Arthur Conan Doyle",
-        "link": "https://www.gutenberg.org/ebooks/1661.pdf.images"
-    }
-}
+# --- Mock Book Database (REMOVED) ---
+# This static dictionary is no longer needed. We will fetch books from a live API.
+
 
 # --- Bot Command Handlers ---
 
@@ -97,45 +75,88 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
 async def find_book(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """
-    Handles user messages, searches for the book, and replies with the result.
+    Handles user messages, searches for the book using Google Books API, and replies with the result.
     """
-    user_query = update.message.text.lower().strip()
+    user_query = update.message.text.strip()
     logger.info(f"User '{update.effective_user.username}' searched for: '{user_query}'")
 
-    await update.message.reply_text(f"Searching for '{user_query}'... 🕵️‍♂️")
+    await update.message.reply_chat_action('typing') # Let the user know the bot is working
 
-    # Search in our mock database (case-insensitive)
-    book_info = MOCK_BOOK_DATABASE.get(user_query)
+    # Google Books API endpoint
+    api_url = f"https://www.googleapis.com/books/v1/volumes?q={user_query}&maxResults=5"
 
-    if book_info:
-        # Book found
-        download_link = book_info["link"]
-        author = book_info["author"]
+    try:
+        response = requests.get(api_url)
+        response.raise_for_status()  # Raise an exception for bad status codes (4xx or 5xx)
+        data = response.json()
+
+        if "items" not in data:
+            # Handle case where no books are found
+            response_message = (
+                f"❌ *Sorry!* I couldn't find any books matching '{user_query}'.\n\n"
+                "Please try a different title or author."
+            )
+            await update.message.reply_text(response_message, parse_mode='Markdown')
+            return
+
+        # Find the first book with a downloadable PDF
+        found_book = None
+        for item in data["items"]:
+            if item.get("accessInfo", {}).get("pdf", {}).get("isAvailable", False):
+                found_book = item
+                break
         
-        response_message = (
-            f"✅ *Success!* I found your book.\n\n"
-            f"📚 *Title:* {user_query.title()}\n"
-            f"✒️ *Author:* {author}\n\n"
-            "Click the button below to download the PDF."
-        )
-        
-        keyboard = [
-            [InlineKeyboardButton("⬇️ Download PDF", url=download_link)]
-        ]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        
-        await update.message.reply_text(
-            response_message, 
-            parse_mode='Markdown', 
-            reply_markup=reply_markup
-        )
-    else:
-        # Book not found
-        response_message = (
-            f"❌ *Sorry!* I couldn't find a PDF for '{user_query.title()}'.\n\n"
-            "Please double-check the spelling. My library is always growing, so feel free to try again later!"
-        )
-        await update.message.reply_text(response_message, parse_mode='Markdown')
+        if found_book:
+            # A book with a downloadable PDF was found
+            info = found_book.get("volumeInfo", {})
+            title = info.get("title", "No Title")
+            authors = ", ".join(info.get("authors", ["Unknown Author"]))
+            
+            # The webReaderLink for public domain books usually offers a PDF download option.
+            download_link = found_book.get("accessInfo", {}).get("webReaderLink")
+
+            response_message = (
+                f"✅ *Success!* I found a downloadable version.\n\n"
+                f"📚 *Title:* {title}\n"
+                f"✒️ *Author(s):* {authors}\n\n"
+                "Click the button below to open it."
+            )
+            
+            keyboard = [
+                [InlineKeyboardButton("⬇️ Open & Download", url=download_link)]
+            ]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            
+            await update.message.reply_text(
+                response_message, 
+                parse_mode='Markdown', 
+                reply_markup=reply_markup
+            )
+        else:
+            # Books were found, but none had a downloadable PDF
+            # We can offer a preview link from the first result instead.
+            first_result_info = data["items"][0].get("volumeInfo", {})
+            title = first_result_info.get("title", "No Title")
+            authors = ", ".join(first_result_info.get("authors", ["Unknown Author"]))
+            preview_link = first_result_info.get("previewLink")
+
+            response_message = (
+                f"🤔 I found '{title}' by {authors}, but a free, legal PDF isn't available.\n\n"
+                "This usually happens with copyrighted books. You can check out a preview instead."
+            )
+            keyboard = [
+                [InlineKeyboardButton("📘 View Preview", url=preview_link)]
+            ]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            await update.message.reply_text(
+                response_message, 
+                parse_mode='Markdown',
+                reply_markup=reply_markup
+                )
+
+    except requests.exceptions.RequestException as e:
+        logger.error(f"API request failed: {e}")
+        await update.message.reply_text("- *Oops!* I'm having trouble connecting to my library. Please try again in a moment.")
 
 
 async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -172,3 +193,4 @@ def main() -> None:
 
 if __name__ == '__main__':
     main()
+

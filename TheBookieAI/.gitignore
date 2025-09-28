@@ -1,9 +1,9 @@
-TheBookieAI/.gitignore
-Ignore Python virtual environment
+#TheBookieAI/.gitignore
+#Ignore Python virtual environment
 venv/
 pycache/
 *.pyc
 
-Ignore environment variables file
-This file contains secrets and should NEVER be committed to Git.
+#Ignore environment variables file
+#This file contains secrets and should NEVER be committed to Git.
 config/.env
