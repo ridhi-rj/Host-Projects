@@ -148,7 +148,7 @@ export default function BookieSearch() {
       <div className="relative z-10 p-6">
         <div className="flex justify-between items-center max-w-6xl mx-auto">
           <div className="flex items-center gap-3">
-            <img src="https://i.imgur.com/9KCtYod.png" alt="Bookie Bot" className="w-16 h-16 animate-wiggle" />
+            <img src="/images/bookie-bot.png" alt="Bookie Bot" className="w-16 h-16 animate-wiggle" />
             <div>
               <h1 className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-purple-900'}`}>
                 Bookie AI
@@ -171,7 +171,7 @@ export default function BookieSearch() {
       <div className="relative z-10 flex flex-col items-center justify-center px-6 py-12">
         <div className={`${darkMode ? 'glass-dark' : 'glass'} rounded-3xl p-8 mb-8 max-w-2xl w-full shadow-2xl`}>
           <div className="flex items-center gap-4 mb-4">
-            <img src="https://i.imgur.com/9KCtYod.png" alt="Bookie Bot" className="w-24 h-24 animate-bounce" />
+            <img src="/images/bookie-bot.png" alt="Bookie Bot" className="w-24 h-24 animate-bounce" />
             <div className={`flex-1 ${darkMode ? 'bg-indigo-900/50' : 'bg-white/50'} rounded-2xl p-4 relative`}>
               <div className="absolute -left-3 top-5 w-0 h-0 border-t-8 border-t-transparent border-b-8 border-b-transparent border-r-8" 
                    style={{ borderRightColor: darkMode ? 'rgba(49, 46, 129, 0.5)' : 'rgba(255, 255, 255, 0.5)' }}>
